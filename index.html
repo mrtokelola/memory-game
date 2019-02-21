@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style type="text/css">
+  div#memory_board {
+  background: #CCC;
+  border: #999 1px solid;
+  width: 800px;
+  height: 540px;
+  padding: 24px;
+  margin: 0px auto;
+}
+
+div#memory_board > div{
+  border: #000 1px solid;
+  width: 38px;
+  height: 71px;
+  float: left;
+  margin: 10px;
+  padding: 20px;
+  font-size: 64px;
+  cursor: pointer;
+  text-align: center;
+}
+
+div#memory_board .card-back {
+  background: url(card_bg.png) no-repeat;
+  background-size: contain;
+}
+</style>
+
+</head>
+<body>
+
+  <div id="memory_board"></div>
+
+<script type="text/javascript">
+var cardsArray = ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E', 'F', 'F', 'G', 'G', 'H', 'H', 'I', 'I', 'J', 'J', 'K', 'K', 'L', 'L']; //Deck of cards
+var cardsValue = []; //Stores the values of the flipped cards
+var cardsDownIds = []; //Stores cards facedown after they've been shuffled
+var cardsFlipped = 0; //Keeps track of cards flipped
+var waiting = false;
+
+function shuffleCards(array) { //
+  for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+  }
+}
+
+function newGame() {
+  cardsFlipped = 0;
+  var outPut = " ";
+  shuffleCards(cardsArray);
+  for (var i = 0; i < cardsArray.length; i++) {
+    outPut += '<div class="card-back" id="card_' + i + ' " onclick="memoryCardFlipped(this,\' ' + cardsArray[i] + '\')"> </div>';
+  }
+  document.getElementById('memory_board').innerHTML = outPut;
+}
+
+function memoryCardFlipped(card, value) {
+  if (card.classList.contains("card-back") && !waiting) {
+    card.classList.remove("card-back");
+    card.innerHTML = value;
+    card.value = value;
+    // if cardsValue has less than 2 cards, push in the card
+    if (cardsValue.length < 2) {
+      cardsValue.push(card);
+    }
+    // if cardsValue has exactly two cards in it,
+    if (cardsValue.length === 2 ) {
+      // if the two cards have different values, flip them and empty cardsValue
+      if (cardsValue[0].value === cardsValue[1].value) {
+        cardsValue = [];
+        cardsFlipped += 2;
+        console.log("SUCCESS!!!, cardsFlipped = ", cardsFlipped);
+        // if cardsFlipped is the same as the length of cardsArray, start a new game
+        if (cardsFlipped === cardsArray.length) {
+          newGame();
+        }        
+      // else just empty cardsValue
+      } else {
+        waiting = true;
+        setTimeout(function() {
+          cardsValue[0].classList.add('card-back');
+          cardsValue[0].innerHTML = "";
+          cardsValue[1].classList.add('card-back');
+          cardsValue[1].innerHTML = "";
+          cardsValue = [];
+          waiting = false;
+        }, 1000);
+      }
+    }
+
+  }
+}
+shuffleCards(cardsArray);
+newGame();
+</script>
+
+</body>
+</html>
